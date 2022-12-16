@@ -1,4 +1,4 @@
-SRC_DIR		= sec
+SRC_DIR		= src
 TEST_DIR	= tests
 CHECK_DIRS = $(SRC_DIR) $(TEST_DIR)
 DOCS_DIR 	= docs
