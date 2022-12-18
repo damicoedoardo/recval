@@ -7,6 +7,7 @@ DOCS_DIR 	= docs
 install: ## Install the poetry environment and install the pre-commit hooks
 	@echo "🚀 Creating virtual environment using pyenv and poetry"
 	@poetry install	
+	@poetry update	
 	@ poetry run pre-commit install
 	@poetry shell
 
@@ -19,8 +20,9 @@ check: ## Run code quality tools.
 	@poetry run isort $(CHECK_DIRS)
 	@echo "🚀 Static type checking: Running mypy"
 	@poetry run mypy $(CHECK_DIRS)
-	@echo "🚀 Launch the linting tool"
+	@echo "🚀 Launch the linting tool $(SRC_DIR)"
 	@poetry run pylint -j 0 $(SRC_DIR)
+	@echo "🚀 Launch the linting tool $(TEST_DIR)"
 	@poetry run pylint -j 0 -d missing-function-docstring $(TEST_DIR)
 
 .PHONY: test
