@@ -57,6 +57,7 @@ def get_hit_rank(
         on=col_user,
         how="right",
     )
+
     df_hit_count["hit"] = df_hit_count["hit"].fillna(0)
 
     return df_hit, df_hit_count
