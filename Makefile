@@ -18,16 +18,16 @@ check: ## Run code quality tools.
 	@echo "🚀 formatting code: black and isort"
 	@poetry run black $(CHECK_DIRS)
 	@poetry run isort $(CHECK_DIRS)
-	@echo "🚀 Static type checking: Running mypy"
+	@echo "😰 Static type checking: Running mypy"
 	@poetry run mypy $(CHECK_DIRS)
-	@echo "🚀 Launch the linting tool $(SRC_DIR)"
+	@echo "🙄 Launch the linting tool $(SRC_DIR)"
 	@poetry run pylint -j 0 $(SRC_DIR)
-	@echo "🚀 Launch the linting tool $(TEST_DIR)"
+	@echo "🙄 Launch the linting tool $(TEST_DIR)"
 	@poetry run pylint -j 0 -d missing-function-docstring $(TEST_DIR)
 
 .PHONY: test
 test: ## Launch the tests
-	@echo "🚀 Testing code: Running pytest"
+	@echo "🥶 Testing code: Running pytest"
 	@poetry run pytest $(TEST_DIR)
 
 .PHONY: clean
