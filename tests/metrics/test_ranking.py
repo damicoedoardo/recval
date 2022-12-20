@@ -21,5 +21,5 @@ def test_average_precision(dummy_recs_gt_cutoff):
     df_hit, df_hit_count = get_hit_rank(
         ground_truth_df=gt_df, pred_df=recs_df, cutoff=cutoff
     )
-    map_df = average_precision(df_hit=df_hit, df_hit_count=df_hit_count)
-    assert map_df["avg_prec"].values == pytest.approx(np.array([1.0, 0.0, 1.0]))
+    ap_df = average_precision(df_hit=df_hit, df_hit_count=df_hit_count)
+    assert ap_df["avg_prec"].values == pytest.approx(np.array([0.5, 0.0, 1.0]))

@@ -48,14 +48,14 @@ def average_precision(
     col_user: str = DEFAULT_USER_COL,
 ) -> pd.DataFrame:
     """Average Precision (AP)
-    Info: https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#Mean_average_precision
+    Info: https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#Average_precision
     Args:
         df_hit (pd.DataFrame): df containing number of hit and number of ground truth item for each user.
         df_hit_count (pd.DataFrame): df containing number of hit and number of ground truth item for each user.
         col_user (str, optional): column containing user_ids. Defaults to `user_id`.
 
     Returns:
-        pd.DataFrame: MAP for each user.
+        pd.DataFrame: AP for each user.
     """
     if df_hit.shape[0] == 0:
         # no hit on any user
@@ -71,6 +71,6 @@ def average_precision(
     df_ap = pd.merge(df_ap, df_hit_count, on=col_user, how="right")
     df_ap["rr"] = df_ap["rr"].fillna(0)
 
-    df_ap["avg_prec"] = df_ap["rr"] / (df_ap["hit"] + np.finfo(float).eps)
+    df_ap["avg_prec"] = df_ap["rr"] / (df_ap["actual"] + np.finfo(float).eps)
 
     return df_ap[[DEFAULT_USER_COL, "avg_prec"]]
