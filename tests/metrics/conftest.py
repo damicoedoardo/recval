@@ -23,8 +23,8 @@ def dummy_recs_gt_cutoff():
     # user 2 -> 0 hit, recall = 0.0, precision=0.0
     # user 3 -> 3 hit, recall = 1.0, precision=1.0
 
-    # user 1 ndcg = 0.5454, map=,
-    # user 2 ndcg = 0.0, map=,
-    # user 3 ndcg = 1.0, map=,
+    # user 1 ndcg = 0.6131, map=1.0 ,
+    # user 2 ndcg = 0.0, map=0.0,
+    # user 3 ndcg = 1.0, map=1.0,
 
     return recs_df, gt_df, 3
