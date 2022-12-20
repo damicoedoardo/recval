@@ -11,7 +11,7 @@ def recall(
     """Compute Recall for each user.
 
     Args:
-        df_hit_count (pd.DataFrame): df containing number of hit and ground truth item for each user.
+        df_hit_count (pd.DataFrame): df containing number of hit and number of ground truth item for each user.
         col_user (str, optional): column containing user_ids. Defaults to `user_id`.
 
     Returns:
@@ -30,7 +30,7 @@ def precision(
     """Compute Precision for each user.
 
     Args:
-        df_hit_count (pd.DataFrame): df containing number of hit and ground truth item for each user.
+        df_hit_count (pd.DataFrame): df containing number of hit and number of ground truth item for each user.
         cutoff (int): cutoff used to retrieve recommendations
         col_user (str, optional): column containing user_id. Defaults to user_id.
 
