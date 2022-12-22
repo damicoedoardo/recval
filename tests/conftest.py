@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -28,3 +29,34 @@ def dummy_recs_gt_cutoff():
     # user 3 ndcg = 1.0, map=1.0,
 
     return recs_df, gt_df, 3
+
+
+@pytest.fixture()
+def dummy_userids_scores_holdout():
+    # create dummy scores for 3 users over 5 items with ids -> [0,1,2,3,4]
+    users = [1, 2, 3]
+    scores = np.array(
+        [
+            [0.1, 0.2, 0.3, 0.4, 0.5],
+            [1.1, 1.2, 1.3, 1.4, 1.5],
+            [2.1, 2.2, 2.3, 2.4, 2.5],
+        ]
+    )
+
+    # user 1, holdout_1 = [0]
+    # user 2, holdout_2 = [1,2]
+    # user 3, holdout_3 = [2,3,4]
+    holdout = [
+        0,
+        1,
+        2,
+        2,
+        3,
+        4,
+    ]
+    u_holdout = [1, 2, 2, 3, 3, 3]
+    holdout_df = pd.DataFrame(
+        zip(u_holdout, holdout), columns=[DEFAULT_USER_COL, DEFAULT_ITEM_COL]
+    )
+
+    return users, scores, holdout_df

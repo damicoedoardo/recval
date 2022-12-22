@@ -1,5 +1,6 @@
 import heapq
 import logging
+from enum import EnumMeta
 
 import numpy as np
 import numpy.typing as npt
@@ -87,3 +88,14 @@ def nb_get_topk(
             top_items[i][idx] = topk[idx][1]
 
     return top_items, top_scores
+
+
+class MetaEnum(EnumMeta):
+    """Enumerator metaclass implementing __contains__ method"""
+
+    def __contains__(cls, item) -> bool:  # type: ignore
+        try:
+            cls(item)  # pylint: disable=no-value-for-parameter
+        except ValueError:
+            return False
+        return True
