@@ -19,10 +19,6 @@ update: ## Update python dependencies
 build: ## Builds a package, as a tarball and a wheel by default.
 	@poetry build
 
-# .PHONY: release
-# release: ## Build and Publishes a package to a remote repository.
-# 	@poetry publish --build
-
 .PHONY: format
 format:
 	@poetry run black $(CHECK_DIRS)
@@ -68,6 +64,18 @@ clean: ## Clean the repository
 	rm -rf dist
 	rm -rf *.egg-info
 	rm -rf coverage
+
+.PHONY: docs-test
+docs-test: ## Test if documentation can be built without warnings or errors
+	@poetry run mkdocs build -s
+
+.PHONY: docs
+docs: ## Build and serve the documentation
+	@poetry run mkdocs serve
+
+# .PHONY: release
+# release: ## Build and Publishes a package to a remote repository.
+# 	@poetry publish --build
 
 .PHONY: help
 help: ## Show the available commands
