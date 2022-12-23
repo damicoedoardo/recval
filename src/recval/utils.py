@@ -5,9 +5,11 @@ from enum import EnumMeta
 import numpy as np
 import numpy.typing as npt
 from numba import njit, prange
-from pytictoc import TicToc
+
+from .decorators import timeit
 
 
+@timeit
 def get_topk(
     scores: npt.NDArray[np.float_],
     k: int,
@@ -22,13 +24,13 @@ def get_topk(
         tuple[npt.NDArray[np.int_], npt.NDArray[np.float_]]: top_items and top_scores
     """
     # check scores is a two dimensional array
-    assert (
-        adim := scores.ndim
-    ) == 2, f"scores has to be a 2-dimensional array, passed is {adim}-dimensional"
+    if score_dimensions := scores.ndim != 2:
+        raise ValueError(
+            f"scores has to be a 2-dimensional array, passed is {score_dimensions}-dimensional"
+        )
 
     logging.debug("Retrieving Top-K items")
-    timer = TicToc()
-    timer.tic()
+
     # get top K items and scores
     # this determines the un-ordered top-k item indices for each user
     top_items = np.argpartition(scores, -k, axis=1)[:, -k:]
@@ -40,7 +42,6 @@ def get_topk(
     sort_ind = np.argsort(-top_scores)
     top_items = top_items[test_user_idx, sort_ind]
     top_scores = top_scores[test_user_idx, sort_ind]
-    logging.debug(timer.toc())
 
     return top_items, top_scores
 
@@ -77,10 +78,9 @@ def nb_get_topk(
             candidate_score = scores[i][j]
             if j < k:
                 heapq.heappush(score_idx_list, (candidate_score, j))  # type: ignore
-            else:
-                if candidate_score > score_idx_list[0][0]:
-                    # pop smallest value and push new tup
-                    heapq.heapreplace(score_idx_list, (candidate_score, j))  # type: ignore
+            elif candidate_score > score_idx_list[0][0]:
+                # pop smallest value and push new tup
+                heapq.heapreplace(score_idx_list, (candidate_score, j))  # type: ignore
         topk = heapq.nlargest(k, score_idx_list)
 
         for idx in range(k):

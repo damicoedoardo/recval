@@ -768,18 +768,6 @@ files = [
 six = ">=1.5"
 
 [[package]]
-name = "pytictoc"
-version = "1.5.2"
-description = "Time code using syntax similar to tic and toc in MATLAB"
-category = "dev"
-optional = false
-python-versions = "*"
-files = [
-    {file = "pytictoc-1.5.2-py2.py3-none-any.whl", hash = "sha256:0f612ba1e23051e5b0688a45b1d5a2d37388a545db61a69fba83bc7bd735211c"},
-    {file = "pytictoc-1.5.2.tar.gz", hash = "sha256:dd9b636493bf140a1f8113eae296439dd5c8703ed9dcded181ae0936870530eb"},
-]
-
-[[package]]
 name = "pytz"
 version = "2022.7"
 description = "World timezone definitions, modern and historical"
@@ -924,6 +912,18 @@ files = [
 ]
 
 [[package]]
+name = "types-toml"
+version = "0.10.8.1"
+description = "Typing stubs for toml"
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-toml-0.10.8.1.tar.gz", hash = "sha256:171bdb3163d79a520560f24ba916a9fc9bff81659c5448a9fea89240923722be"},
+    {file = "types_toml-0.10.8.1-py3-none-any.whl", hash = "sha256:b7b5c4977f96ab7b5ac06d8a6590d17c0bf252a96efc03b109c2711fb3e0eafd"},
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.4.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
@@ -1033,4 +1033,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "12c8b0ee574232cab8a348efd638a297f6821cb8bb2b6733e1c7503be62cc969"
+content-hash = "339e3cfb7344abda1ee355e61828f4f5ed27289097964bc6454d190baa9e0733"
