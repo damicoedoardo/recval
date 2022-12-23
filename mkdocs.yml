@@ -55,7 +55,8 @@ theme:
 
 nav:
   - Home: index.md
-  - Installation: installation.md
+  - Setup: setup.md
+  - Philosophy: philosophy.md
   - Docs: reference/
 
 extra_css:
