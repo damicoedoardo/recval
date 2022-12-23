@@ -7,10 +7,6 @@ edit_uri: edit/main/docs/
 repo_name: damicoedoardo/recval
 # copyright: Maintained by <a href="https://https://github.com/damicoedoardo">Edoardo D'Amico</a>.
 
-nav:
-  - Home: index.md
-  - Code Reference: reference/
-
 plugins:
   - search
   - gen-files:
@@ -28,8 +24,11 @@ plugins:
 
 theme:
   name: material
-  feature:
-    tabs: true
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.tracking
+    - navigation.instant
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
@@ -45,16 +44,19 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
-
   markdown_extensions:
     - toc:
         permalink: True
         toc_depth: 2
     - pymdownx.highlight
     - pymdownx.superfences
-
   icon:
     repo: fontawesome/brands/github
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Docs: reference/
 
 extra_css:
   - stylesheets/extra.css
