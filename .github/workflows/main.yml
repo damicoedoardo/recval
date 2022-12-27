@@ -6,9 +6,10 @@ on:
 env:
   SRC_DIR: src
   TEST_DIR: tests
-  CHECK_DIRS: $SRC_DIR $TEST_DIR
+  CHECK_DIRS: ${{SRC_DIR}} ${{TEST_DIR}}
   DOCS_DIR: docs
   PYTEST_FLAGS: -vv -n auto --cov=src
+  PYTHON_VERSION: "3.10.9"
 
 jobs:
   build:
@@ -20,21 +21,21 @@ jobs:
   format-check:
     runs-on: ubuntu-latest
     steps:
-      - run: poetry run black --check $CHECK_DIRS
-      - run: poetry run isort --check $CHECK_DIRS
+      - run: poetry run black --check ${{CHECK_DIRS}}
+      - run: poetry run isort --check ${{CHECK_DIRS}}
 
   lint:
     runs-on: ubuntu-latest
     steps:
-      - run: poetry run pylint -j 0 $SRC_DIR
-      - run: poetry run pylint -j 0 -d missing-function-docstring -d missing-class-docstring $TEST_DIR
+      - run: poetry run pylint -j 0 ${{SRC_DIR}}
+      - run: poetry run pylint -j 0 -d missing-function-docstring -d missing-class-docstring ${{TEST_DIR}}
 
   type-check:
     runs-on: ubuntu-latest
     steps:
-      - run: poetry run mypy $CHECK_DIRS
+      - run: poetry run mypy ${{CHECK_DIRS}}
 
   tests:
     runs-on: ubuntu-latest
     steps:
-      - run: poetry run pytest $PYTEST_FLAGS --cov-fail-under=100
+      - run: poetry run pytest ${{PYTEST_FLAGS}} --cov-fail-under=100
