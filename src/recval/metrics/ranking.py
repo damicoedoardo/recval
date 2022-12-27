@@ -61,7 +61,7 @@ def average_precision(
         # no hit on any user
         df_ap = df_hit_count.copy()
         df_ap["avg_prec"] = 0
-        return df_ap[[DEFAULT_USER_COL, "map"]]
+        return df_ap[[DEFAULT_USER_COL, "avg_prec"]]
 
     # calculate reciprocal rank of items for each user and sum them up
     df_ap = df_hit.copy()

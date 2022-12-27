@@ -6,10 +6,8 @@ from recval.metrics.metrics_utils import get_hit_rank
 
 
 def test_get_hit_rank(dummy_recs_gt_cutoff):
-    recs_df, gt_df, cutoff = dummy_recs_gt_cutoff
-    df_hit, df_hit_count = get_hit_rank(
-        ground_truth_df=gt_df, pred_df=recs_df, cutoff=cutoff
-    )
+    recs_df, gt_df, _ = dummy_recs_gt_cutoff
+    df_hit, df_hit_count = get_hit_rank(ground_truth_df=gt_df, pred_df=recs_df)
     expected_user_id = np.array([1, 3, 3, 3])
     expected_rank = np.array([1, 1, 2, 3])
     expected_item_id = np.array([1, 7, 8, 9])

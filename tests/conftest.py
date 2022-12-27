@@ -12,6 +12,7 @@ def dummy_recs_gt_cutoff():
     recs_df = pd.DataFrame(
         zip(users, items), columns=[DEFAULT_USER_COL, DEFAULT_ITEM_COL]
     )
+    recs_df["rank"] = np.tile(np.arange(1, 4), 3)
 
     users_gt = [1, 1, 2, 2, 3, 3, 3]
     items_gt = [1, 5, 2, 3, 7, 8, 9]

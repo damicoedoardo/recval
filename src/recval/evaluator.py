@@ -8,7 +8,7 @@ import numpy.typing as npt
 import pandas
 
 from recval.constants import DEFAULT_ITEM_COL, DEFAULT_USER_COL
-from recval.metrics.metric_interface import MetricsEnum
+from recval.metrics.metric_interface import MetricInterface
 from recval.metrics.metrics_utils import get_hit_rank
 from recval.utils import get_topk
 
@@ -21,27 +21,22 @@ class RecEvaluator:
     """Main class used to evaluate recommender system algorithm
 
     Attributes:
-        metrics_list (list[str]): metrics used for the evaluation.
-        cutoffs_list (list[int] | npt.NDArray[numpy.int_]): list of cutoffs used to evaluate the recommendations.
+        metrics (list[str]): metrics used for the evaluation.
+        cutoffs (list[int] | npt.NDArray[numpy.int_]): list of cutoffs used to evaluate the recommendations.
     """
 
-    metrics_list: list[str]
-    cutoffs_list: list[int] | npt.NDArray[numpy.int_]
+    metrics: list[str]
+    cutoffs: list[int] | npt.NDArray[numpy.int_]
     max_cutoff: int = field(init=False)
+    metrics_objs: list[MetricInterface] = field(init=False, default_factory=lambda: [])
 
     def __post_init__(self) -> None:
-        self._check_metrics()
-        self.max_cutoff = max(self.cutoffs_list)
+        self.max_cutoff = max(self.cutoffs)
+        # convert metrics name in metrics objects
+        for metric_name in self.metrics:
+            self.metrics_objs.append(MetricFactory.from_name(metric_name))
 
-    def _check_metrics(self) -> None:
-        """Check if metrics passed as input are valid"""
-
-        for metric_class in self.metrics_list:
-            if metric_class not in MetricsEnum:
-                raise ValueError(
-                    f"Metric: {metric_class} is not a valid metric. {MetricsEnum.available_metrics()}"
-                )
-
+    @timeit
     def eval_from_scores(  # pylint: disable=[too-many-arguments,too-many-locals]
         self,
         scores: npt.NDArray[numpy.float_],
@@ -77,22 +72,6 @@ class RecEvaluator:
                 "user_ids have not been passed as input, creating consecutive user_ids starting from 0"
             )
             user_ids = numpy.arange(scores.shape[0])
-        return self.get_top_k(
-            scores, holdout_data, user_ids, verbose, decimal_precision
-        )
-
-    @timeit
-    def get_top_k(
-        self,
-        scores: npt.NDArray[numpy.float_],
-        holdout_data: pandas.DataFrame,
-        user_ids: npt.NDArray[numpy.int_] | list[int] | None = None,
-        verbose: bool = True,
-        decimal_precision: int = 4,
-    ) -> pandas.DataFrame:
-        """
-        retrieving recommendations with the highest cutoff passed
-        """
 
         logging.debug("Retrieving topk items")
         top_items, _ = get_topk(scores=scores, k=self.max_cutoff)
@@ -100,27 +79,63 @@ class RecEvaluator:
         # repreat max_cutoff times the user ids
         users_rep = numpy.repeat(user_ids, self.max_cutoff)
         recs_df = pandas.DataFrame(
-            zip(users_rep, top_items), columns=[DEFAULT_USER_COL, DEFAULT_ITEM_COL]
+            zip(users_rep, top_items.flatten()),
+            columns=[DEFAULT_USER_COL, DEFAULT_ITEM_COL],
         )
+
+        metrics_df = self.eval_from_recs(
+            recs_df=recs_df,
+            holdout_data=holdout_data,
+            verbose=verbose,
+            decimal_precision=decimal_precision,
+        )
+        return metrics_df
+
+    def eval_from_recs(
+        self,
+        recs_df: pandas.DataFrame,
+        holdout_data: pandas.DataFrame,
+        verbose: bool = True,
+        decimal_precision: int = 4,
+    ) -> pandas.DataFrame:
+        """Evaluate recommender system from recommendations
+
+        Args:
+            recs_df (pandas.DataFrame): recommendations df.
+            holdout_data (pandas.DataFrame): ground truth data against which perform evaluation.
+            verbose (bool, optional): Wheter or not print metric results. Defaults to True.
+            decimal_precision (int, optional): precision with which compute evaluation metrics. Defaults to 4.
+
+        Returns:
+            pandas.DataFrame: dataframe containing the result metrics for each cutoff.
+        """
+
+        if "rank" not in recs_df.columns:
+            # adding rank column on recs dataframe
+            recs_df["rank"] = numpy.tile(
+                numpy.arange(1, self.max_cutoff + 1),
+                recs_df[DEFAULT_USER_COL].nunique(),
+            )
 
         metric_name_list = []
         cutoff_list = []
         metric_res_list = []
-        for cutoff in self.cutoffs_list:
+        for cutoff in self.cutoffs:
+            # filter recs on current cutoff
+            recs_df_cutoff = recs_df[recs_df["rank"] <= cutoff]
             df_hit, df_hit_count = get_hit_rank(
-                ground_truth_df=holdout_data, pred_df=recs_df, cutoff=cutoff
+                ground_truth_df=holdout_data, pred_df=recs_df_cutoff
             )
-            for metric_clss in self.metrics_list:
-                metric = MetricFactory.from_name(metric_clss)
-                res = metric(df_hit=df_hit, df_hit_count=df_hit_count, cutoff=cutoff)
+            for metric in self.metrics_objs:
+                res = metric(df_hit, df_hit_count, cutoff)
 
                 # append results
-                metric_name_list.append(metric_clss)
+                metric_name_list.append(metric.name_())
                 cutoff_list.append(cutoff)
                 metric_res_list.append(res)
 
                 if verbose:
-                    print(f"{metric_clss}@{cutoff}: {round(res, decimal_precision)}")
+                    print(f"{metric.name_()}@{cutoff}: {round(res, decimal_precision)}")
         return pandas.DataFrame(
             zip(metric_name_list, cutoff_list, metric_res_list),
             columns=["metric", "cutoff", "value"],

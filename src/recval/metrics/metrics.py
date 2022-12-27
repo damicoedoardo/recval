@@ -32,7 +32,7 @@ class MAP(MetricInterface):  # pylint: disable=too-few-public-methods
 
     @staticmethod
     def name_() -> str:
-        return "MAP"
+        return "map"
 
     def compute_metric(
         self, df_hit: pandas.DataFrame, df_hit_count: pandas.DataFrame, _: int

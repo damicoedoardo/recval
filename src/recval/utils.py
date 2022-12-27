@@ -30,24 +30,21 @@ def get_topk(
         )
 
     logging.debug("Retrieving Top-K items")
-
-    # get top K items and scores
     # this determines the un-ordered top-k item indices for each user
     top_items = np.argpartition(scores, -k, axis=1)[:, -k:]
-    # top_items = np.argpartition(scores, -k, axis=1)[:, -k:]
-    test_user_idx = np.arange(scores.shape[0])[:, None]
-    top_scores = scores[test_user_idx, top_items]
+    top_scores = np.take_along_axis(scores, top_items, axis=1)
 
     # sort top k items
     sort_ind = np.argsort(-top_scores)
-    top_items = top_items[test_user_idx, sort_ind]
-    top_scores = top_scores[test_user_idx, sort_ind]
+
+    top_items = np.take_along_axis(top_items, sort_ind, axis=1)
+    top_scores = np.take_along_axis(top_scores, sort_ind, axis=1)
 
     return top_items, top_scores
 
 
 @njit(cache=True, parallel=True)  # type: ignore
-def nb_get_topk(
+def numba_get_topk(
     scores: npt.NDArray[np.float_], k: int
 ) -> tuple[npt.NDArray[np.int64], npt.NDArray[np.float32]]:
     """Retrieve the top-k items and scores from a score matrix
