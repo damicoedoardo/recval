@@ -21,6 +21,8 @@ pylint = "^2.14.3"
 pytest = "^7.1.2"
 pytest-cov = "^4.0.0"
 types-toml = "^0.10.8.1"
+hypothesis = "^6.61.0"
+hypothesis-numpy = "^2.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
