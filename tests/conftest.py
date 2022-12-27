@@ -25,7 +25,7 @@ def dummy_recs_gt_cutoff():
     # user 2 -> 0 hit, recall = 0.0, precision=0.0
     # user 3 -> 3 hit, recall = 1.0, precision=1.0
 
-    # user 1 ndcg = 0.6131
+    # user 1 ndcg = 0.6131 test worflows
     # user 2 ndcg = 0.0
     # user 3 ndcg = 1.0
 
