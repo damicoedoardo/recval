@@ -21,12 +21,6 @@ def ndcg(
     Returns:
         pd.DataFrame: nDCG for each user.
     """
-    if df_hit.shape[0] == 0:
-        # no hit on any user
-        df_ndcg = df_hit_count.copy()
-        df_ndcg["ndcg"] = 0
-        return df_ndcg[[DEFAULT_USER_COL, "ndcg"]]
-
     df_dcg = df_hit.copy()
     # compute DCG, relevance in this case is always 1
     df_dcg["dcg"] = 1 / np.log2(df_dcg["rank"] + 1)
@@ -57,12 +51,6 @@ def average_precision(
     Returns:
         pd.DataFrame: AP for each user.
     """
-    if df_hit.shape[0] == 0:
-        # no hit on any user
-        df_ap = df_hit_count.copy()
-        df_ap["avg_prec"] = 0
-        return df_ap[[DEFAULT_USER_COL, "avg_prec"]]
-
     # calculate reciprocal rank of items for each user and sum them up
     df_ap = df_hit.copy()
     df_ap["rr"] = (df_ap.groupby(col_user).cumcount() + 1) / df_ap["rank"]

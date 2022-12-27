@@ -35,6 +35,9 @@ def get_hit_rank(
         [col_user, col_item, "rank"]
     ]
 
+    if len(df_hit) == 0:
+        raise ValueError("No hits found in prediction data.")
+
     # count the number of hits vs actual relevant items per user
     df_hit_count = pandas.merge(
         df_hit.groupby(col_user, as_index=False)[col_user].agg({"hit": "count"}),

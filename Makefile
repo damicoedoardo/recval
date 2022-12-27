@@ -48,7 +48,7 @@ test: ## Launch the tests
 
 .PHONY: coverage
 coverage: ## Computes test coverage
-	@poetry run pytest $(PYTEST_FLAGS) --cov-report html:generated/reports/coverage
+	@poetry run pytest $(PYTEST_FLAGS) --cov-report html
 
 .PHONY: check
 check: ## Run code quality tools.

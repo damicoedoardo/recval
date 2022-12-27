@@ -1,5 +1,6 @@
 import hypothesis.strategies as st
 import numpy as np
+import pytest
 from hypothesis import given
 from hypothesis.extra.numpy import arrays
 
@@ -32,3 +33,9 @@ def test_nb_get_topk_arange():
     top_items, top_scores = numba_get_topk(scores=dummy_scores, k=1)
     assert all(i == 9 for i in top_items)
     assert all(s == 99 for s in top_scores)
+
+
+def test_get_topk_scores_wrong_shape():
+    scores = np.random.rand(10, 10, 10)
+    with pytest.raises(ValueError):
+        get_topk(scores, k=1)

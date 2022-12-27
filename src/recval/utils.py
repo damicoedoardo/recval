@@ -1,6 +1,5 @@
 import heapq
 import logging
-from enum import EnumMeta
 
 import numpy as np
 import numpy.typing as npt
@@ -43,7 +42,7 @@ def get_topk(
     return top_items, top_scores
 
 
-@njit(cache=True, parallel=True)  # type: ignore
+@njit(cache=True, parallel=True)  # type: ignore # pragma: no cover
 def numba_get_topk(
     scores: npt.NDArray[np.float_], k: int
 ) -> tuple[npt.NDArray[np.int64], npt.NDArray[np.float32]]:
@@ -85,14 +84,3 @@ def numba_get_topk(
             top_items[i][idx] = topk[idx][1]
 
     return top_items, top_scores
-
-
-class MetaEnum(EnumMeta):
-    """Enumerator metaclass implementing __contains__ method"""
-
-    def __contains__(cls, item) -> bool:  # type: ignore
-        try:
-            cls(item)  # pylint: disable=no-value-for-parameter
-        except ValueError:
-            return False
-        return True

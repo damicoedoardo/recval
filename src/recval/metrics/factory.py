@@ -1,4 +1,5 @@
 from typing import Any
+
 from .metric_interface import MetricInterface
 from .metrics import MAP, NDCG, F1Score, Precision, Recall
 

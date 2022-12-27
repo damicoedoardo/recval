@@ -1,10 +1,11 @@
 import logging
 import time
 from functools import wraps
-from typing import Any, Callable, TypeVar, ParamSpec
+from typing import Any, Callable, ParamSpec, TypeVar
 
-T = TypeVar('T')
-P = ParamSpec('P')
+T = TypeVar("T")
+P = ParamSpec("P")
+
 
 def timeit(func: Callable[P, T]) -> Callable[P, T]:
     """

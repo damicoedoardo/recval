@@ -1,5 +1,6 @@
 # get_hit_rank
 import numpy as np
+import pytest
 
 from recval.constants import DEFAULT_ITEM_COL, DEFAULT_USER_COL
 from recval.metrics.metrics_utils import get_hit_rank
@@ -23,3 +24,9 @@ def test_get_hit_rank(dummy_recs_gt_cutoff):
     assert (df_hit_count[DEFAULT_USER_COL].values == expected_user_id).all()
     assert (df_hit_count["hit"].values == expected_hit).all()
     assert (df_hit_count["actual"].values == expected_actual).all()
+
+
+def test_get_hit_rank_no_hits(no_hit_recs_gt):
+    recs_df, gt_df = no_hit_recs_gt
+    with pytest.raises(ValueError):
+        get_hit_rank(ground_truth_df=gt_df, pred_df=recs_df)

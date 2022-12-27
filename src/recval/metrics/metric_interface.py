@@ -22,7 +22,7 @@ class MetricInterface:
         self.name = self.name_()
 
     @staticmethod
-    def name_() -> str:
+    def name_() -> str:  # pragma: no cover
         """Return the name of the metric"""
         return "Abstract Metric"
 
@@ -41,7 +41,7 @@ class MetricInterface:
 
     def compute_metric(
         self, df_hit: pandas.DataFrame, df_hit_count: pandas.DataFrame, cutoff: int
-    ) -> float:
+    ) -> float:  # pragma: no cover
         """
         Compute value of the metric
 
