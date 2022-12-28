@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: poetry run black --check src tests
-      - run: poetry run isort --check ${{SRC_DIR}} ${{TEST_DIR}}
+      - run: poetry run isort --check "${{SRC_DIR}}" "${{TEST_DIR}}"
 
   lint:
     runs-on: ubuntu-latest
