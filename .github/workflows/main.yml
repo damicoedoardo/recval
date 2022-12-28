@@ -20,7 +20,7 @@ jobs:
   format-check:
     runs-on: ubuntu-latest
     steps:
-      - run: poetry run black --check ${{SRC_DIR}} ${{TEST_DIR}}
+      - run: poetry run black --check src tests
       - run: poetry run isort --check ${{SRC_DIR}} ${{TEST_DIR}}
 
   lint:
