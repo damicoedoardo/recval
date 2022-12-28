@@ -35,6 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - run: source .venv/bin/activate
       - run: poetry run black --check src tests
       - run: poetry run isort --check src tests
 
