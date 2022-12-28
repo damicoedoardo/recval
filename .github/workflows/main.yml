@@ -4,34 +4,34 @@ on:
       - master
 
 jobs:
-  check-out:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup-poetry
 
   format-check:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - run: poetry run black --check src tests
       - run: poetry run isort --check src tests
 
   lint:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - run: poetry run pylint -j 0 src
       - run: poetry run pylint -j 0 -d missing-function-docstring -d missing-class-docstring tests
 
   type-check:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - run: poetry run mypy src tests
 
   tests:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - run: poetry run pytest -vv -n auto --cov=src --cov-fail-under=100
