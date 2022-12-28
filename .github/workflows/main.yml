@@ -6,7 +6,6 @@ on:
 env:
   SRC_DIR: src
   TEST_DIR: tests
-  CHECK_DIRS: ${{SRC_DIR}} ${{TEST_DIR}}
   DOCS_DIR: docs
   PYTEST_FLAGS: -vv -n auto --cov=src
   PYTHON_VERSION: "3.10.9"
@@ -21,8 +20,8 @@ jobs:
   format-check:
     runs-on: ubuntu-latest
     steps:
-      - run: poetry run black --check ${{CHECK_DIRS}}
-      - run: poetry run isort --check ${{CHECK_DIRS}}
+      - run: poetry run black --check ${{SRC_DIR}} ${{TEST_DIR}}
+      - run: poetry run isort --check ${{SRC_DIR}} ${{TEST_DIR}}
 
   lint:
     runs-on: ubuntu-latest
@@ -33,7 +32,7 @@ jobs:
   type-check:
     runs-on: ubuntu-latest
     steps:
-      - run: poetry run mypy ${{CHECK_DIRS}}
+      - run: poetry run mypy ${{SRC_DIR}} ${{TEST_DIR}}
 
   tests:
     runs-on: ubuntu-latest
