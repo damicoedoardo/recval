@@ -1,59 +1,171 @@
 on:
   push:
     branches:
-      - master
+      - "**"
+    tags-ignore:
+      - "*.*.*"
+
+name: Build & Test
+
+concurrency:
+  group: ci-build-and-test
+
+env:
+  poetry-version: 1.3.1
+  python-version: 3.10.6
 
 jobs:
-  build:
+  poetry:
+    name: Prepare Poetry Environment
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+        name: Checkout
 
       - uses: actions/setup-python@v4
+        name: Setup Python
         with:
-          python-version: "3.10"
+          python-version: ${{ env.python-version }}
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
+      - uses: abatilo/actions-poetry@v2.1.1
+        name: Install Poetry
         with:
-          virtualenvs-in-project: true
+          poetry-version: ${{ env.poetry-version }}
 
-      - name: Load cached venv
-        id: cached-poetry-dependencies
+      - name: Update Poetry cache location
+        run: poetry config virtualenvs.in-project true
+
+      - id: venv_cache
         uses: actions/cache@v3
+        name: Cache or Restore venv
         with:
           path: .venv
-          key: venv-${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles('poetry.lock') }}
+          key: venv-${{ env.python-version }}-${{ env.poetry-version }}-lock-${{ hashFiles('poetry.lock') }}
 
-      - name: Install dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction
-        shell: bash
+      - name: Install Poetry Dependencies
+        run: poetry install
+        if: steps.venv_cache.outputs.cache-hit != 'true'
 
   format-check:
+    name: Check Code Formatting
+    needs: poetry
     runs-on: ubuntu-latest
-    needs: build
     steps:
-      - run: source .venv/bin/activate
-      - run: poetry run black --check src tests
-      - run: poetry run isort --check src tests
+      - uses: actions/checkout@v3
+        name: Checkout
 
-  lint:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - run: poetry run pylint -j 0 src
-      - run: poetry run pylint -j 0 -d missing-function-docstring -d missing-class-docstring tests
+      - uses: actions/setup-python@v4
+        name: Setup Python
+        with:
+          python-version: ${{ env.python-version }}
 
-  type-check:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - run: poetry run mypy src tests
+      - uses: abatilo/actions-poetry@v2.1.1
+        name: Install Poetry
+        with:
+          poetry-version: ${{ env.poetry-version }}
 
-  tests:
+      - name: Update Poetry cache location
+        run: poetry config virtualenvs.in-project true
+
+      - id: venv_cache
+        uses: actions/cache@v3
+        name: Restore venv
+        with:
+          path: .venv
+          key: venv-${{ env.python-version }}-${{ env.poetry-version }}-lock-${{ hashFiles('poetry.lock') }}
+
+      - name: Run Format Check
+        run: make format-check
+
+  linter:
+    name: Check Linting
+    needs: poetry
     runs-on: ubuntu-latest
-    needs: build
     steps:
-      - run: poetry run pytest -vv -n auto --cov=src --cov-fail-under=100
+      - uses: actions/checkout@v3
+        name: Checkout
+
+      - uses: actions/setup-python@v4
+        name: Setup Python
+        with:
+          python-version: ${{ env.python-version }}
+
+      - uses: abatilo/actions-poetry@v2.1.1
+        name: Install Poetry
+        with:
+          poetry-version: ${{ env.poetry-version }}
+
+      - name: Update Poetry cache location
+        run: poetry config virtualenvs.in-project true
+
+      - id: venv_cache
+        uses: actions/cache@v3
+        name: Restore venv
+        with:
+          path: .venv
+          key: venv-${{ env.python-version }}-${{ env.poetry-version }}-lock-${{ hashFiles('poetry.lock') }}
+
+      - name: Run Linter
+        run: make lint
+
+  Type-Check:
+    name: Check Static Typing
+    needs: poetry
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout
+
+      - uses: actions/setup-python@v4
+        name: Setup Python
+        with:
+          python-version: ${{ env.python-version }}
+
+      - uses: abatilo/actions-poetry@v2.1.1
+        name: Install Poetry
+        with:
+          poetry-version: ${{ env.poetry-version }}
+
+      - name: Update Poetry cache location
+        run: poetry config virtualenvs.in-project true
+
+      - id: venv_cache
+        uses: actions/cache@v3
+        name: Restore venv
+        with:
+          path: .venv
+          key: venv-${{ env.python-version }}-${{ env.poetry-version }}-lock-${{ hashFiles('poetry.lock') }}
+
+      - name: Run Static Type Checking
+        run: make type-check
+
+  test:
+    name: Check Tests Passing
+    needs: [poetry, format-check, linter, Type-Check]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout
+
+      - uses: actions/setup-python@v4
+        name: Setup Python
+        with:
+          python-version: ${{ env.python-version }}
+
+      - uses: abatilo/actions-poetry@v2.1.1
+        name: Install Poetry
+        with:
+          poetry-version: ${{ env.poetry-version }}
+
+      - name: Update Poetry cache location
+        run: poetry config virtualenvs.in-project true
+
+      - id: venv_cache
+        uses: actions/cache@v3
+        name: Restore venv
+        with:
+          path: .venv
+          key: venv-${{ env.python-version }}-${{ env.poetry-version }}-lock-${{ hashFiles('poetry.lock') }}
+
+      - name: Run tests
+        run: make test
