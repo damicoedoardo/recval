@@ -1,3 +1,5 @@
+include $(PWD)/.env
+
 SRC_DIR		 = src
 TEST_DIR	 = tests
 CHECK_DIRS   = $(SRC_DIR) $(TEST_DIR)
@@ -17,9 +19,13 @@ update: ## Update python dependencies
 build: ## Builds a package, as a tarball and a wheel by default.
 	@poetry build
 
-# .PHONY: release
-# release: ## Build and Publishes a package to a remote repository.
-# 	@poetry publish --build
+.PHONY: test-release
+test-release: ## Builds a package, as a tarball and a wheel by default.
+	@poetry publish --build --username $(TEST_PYPI_USERNAME) --password $(TEST_PYPI_PASSWORD) -r testpypi
+
+.PHONY: release
+test-release: ## Builds a package, as a tarball and a wheel by default.
+	@poetry publish --build --username $(PYPI_USERNAME) --password $(PYPI_PASSWORD)
 
 .PHONY: format
 format:

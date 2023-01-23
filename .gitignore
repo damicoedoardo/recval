@@ -118,3 +118,5 @@ site/reference/recval/metrics/metrics_utils/index.html
 site/reference/recval/metrics/ranking/index.html
 site/reference/recval/utils/index.html
 site/search/search_index.json
+dist/recval-0.1.0-py3-none-any.whl
+dist/recval-0.1.0.tar.gz
