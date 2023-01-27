@@ -36,26 +36,18 @@ class RecEvaluator:
         for metric_name in self.metrics:
             self.metrics_objs.append(MetricFactory.from_name(metric_name))
 
-    @timeit
-    def eval_from_scores(  # pylint: disable=[too-many-arguments,too-many-locals]
+    def recs_from_scores(
         self,
         scores: npt.NDArray[numpy.float_],
-        holdout_data: pandas.DataFrame,
         user_ids: npt.NDArray[numpy.int_] | list[int] | None = None,
-        verbose: bool = True,
-        decimal_precision: int = 4,
     ) -> pandas.DataFrame:
-        """Evaluate recommender system from estimated scores
-
+        """Compute recommendations from estimated scores
         Args:
             scores (npt.NDArray[numpy.float_]): estiamted scores matrix, row containing users and columns containing items
-            holdout_data (pandas.DataFrame): ground truth data against which perform evaluation
             user_ids (npt.NDArray[numpy.int_] | list[int] | None, optional): user ids associated to each row of the estimated score matrix. Defaults to None. #pylint: disable=line-too-long
-            verbose (bool, optional): Wheter or not print metric results. Defaults to True.
-            decimal_precision (int, optional): precision with which compute evaluation metrics. Defaults to 4.
 
         Returns:
-            pandas.DataFrame: dataframe containing the result metrics for each cutoff.
+            pandas.DataFrame: recommendations dataframe
         """
         if user_ids is not None:
             # check number of user_ids match with scores shape
@@ -82,6 +74,30 @@ class RecEvaluator:
             zip(users_rep, top_items.flatten()),
             columns=[DEFAULT_USER_COL, DEFAULT_ITEM_COL],
         )
+        return recs_df
+
+    @timeit
+    def eval_from_scores(  # pylint: disable=[too-many-arguments,too-many-locals]
+        self,
+        scores: npt.NDArray[numpy.float_],
+        holdout_data: pandas.DataFrame,
+        user_ids: npt.NDArray[numpy.int_] | list[int] | None = None,
+        verbose: bool = True,
+        decimal_precision: int = 4,
+    ) -> pandas.DataFrame:
+        """Evaluate recommender system from estimated scores
+
+        Args:
+            scores (npt.NDArray[numpy.float_]): estiamted scores matrix, row containing users and columns containing items
+            holdout_data (pandas.DataFrame): ground truth data against which perform evaluation
+            user_ids (npt.NDArray[numpy.int_] | list[int] | None, optional): user ids associated to each row of the estimated score matrix. Defaults to None. #pylint: disable=line-too-long
+            verbose (bool, optional): Wheter or not print metric results. Defaults to True.
+            decimal_precision (int, optional): precision with which compute evaluation metrics. Defaults to 4.
+
+        Returns:
+            pandas.DataFrame: dataframe containing the result metrics for each cutoff.
+        """
+        recs_df = self.recs_from_scores(scores=scores, user_ids=user_ids)
 
         metrics_df = self.eval_from_recs(
             recs_df=recs_df,
@@ -91,6 +107,7 @@ class RecEvaluator:
         )
         return metrics_df
 
+    @timeit
     def eval_from_recs(
         self,
         recs_df: pandas.DataFrame,
