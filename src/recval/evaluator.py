@@ -36,14 +36,17 @@ class RecEvaluator:
         for metric_name in self.metrics:
             self.metrics_objs.append(MetricFactory.from_name(metric_name))
 
+    @classmethod
     def recs_from_scores(
-        self,
+        cls,
         scores: npt.NDArray[numpy.float_],
+        cutoff: int,
         user_ids: npt.NDArray[numpy.int_] | list[int] | None = None,
     ) -> pandas.DataFrame:
         """Compute recommendations from estimated scores
         Args:
             scores (npt.NDArray[numpy.float_]): estiamted scores matrix, row containing users and columns containing items
+            cutoff (int): cutoff used to compute recommendations
             user_ids (npt.NDArray[numpy.int_] | list[int] | None, optional): user ids associated to each row of the estimated score matrix. Defaults to None. #pylint: disable=line-too-long
 
         Returns:
@@ -66,10 +69,10 @@ class RecEvaluator:
             user_ids = numpy.arange(scores.shape[0])
 
         logging.debug("Retrieving topk items")
-        top_items, _ = get_topk(scores=scores, k=self.max_cutoff)
+        top_items, _ = get_topk(scores=scores, k=cutoff)
 
         # repreat max_cutoff times the user ids
-        users_rep = numpy.repeat(user_ids, self.max_cutoff)
+        users_rep = numpy.repeat(user_ids, cutoff)
         recs_df = pandas.DataFrame(
             zip(users_rep, top_items.flatten()),
             columns=[DEFAULT_USER_COL, DEFAULT_ITEM_COL],
@@ -97,7 +100,9 @@ class RecEvaluator:
         Returns:
             pandas.DataFrame: dataframe containing the result metrics for each cutoff.
         """
-        recs_df = self.recs_from_scores(scores=scores, user_ids=user_ids)
+        recs_df = RecEvaluator.recs_from_scores(
+            scores=scores, user_ids=user_ids, cutoff=self.max_cutoff
+        )
 
         metrics_df = self.eval_from_recs(
             recs_df=recs_df,
